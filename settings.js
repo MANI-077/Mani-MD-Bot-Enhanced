@@ -14,7 +14,7 @@ const settings = {
   prefix: ".", // prefix (e.g., ., /, !, *)
   timezone: "Asia/Kathmandu", //put your country timeZone....leave blank if u don't know
   updateZipUrl: "",
-  telegramToken: "YOUR_TELEGRAM_BOT_TOKEN", // Add your Telegram bot token here
+  telegramToken: "8980919346:AAGci2djihz7Vz-RAReVqCAcWiS0QLxC8V4", // Add your Telegram bot token here
 };
 
 module.exports = settings;
