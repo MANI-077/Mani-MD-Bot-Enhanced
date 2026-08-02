@@ -43,6 +43,9 @@ module.exports = async (sock, chatId, message) => {
 │❏ .jid
 │❏ .url
 │❏ .tempmail
+│❏ .runtime
+│❏ .repo
+│❏ .system
 │❏ .channel song forward 
 ╰═✪╾✦═✦═✦═✦═✦╼✪═╯
 

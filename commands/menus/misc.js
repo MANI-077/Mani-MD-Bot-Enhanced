@@ -29,6 +29,8 @@ module.exports = async (sock, chatId, message) => {
 │❏ .jail 
 │❏ .passed 
 │❏ .triggered
+│❏ .runtime
+│❏ .system
 │
 ╰═✪╾✦═✦═✦═✦═✦╼✪═╯
 > ${settings.caption}
