@@ -503,6 +503,12 @@
         <div class="copy-hint">⏎ tap the code to copy</div>
         <div class="waiting"><span class="dot"></span> waiting for device link...</div>
       </div>
+
+      <div class="code-wrap" id="qrWrap" style="display: none; text-align: center; margin-top: 28px;">
+        <div id="qrcode" style="background: white; padding: 16px; border-radius: 12px; display: inline-block; box-shadow: 0 0 20px rgba(255,255,255,0.1);"></div>
+        <div class="copy-hint" style="margin-top: 12px;">📸 scan the QR code with WhatsApp</div>
+        <div class="waiting"><span class="dot"></span> waiting for scan...</div>
+      </div>
     </section>
 
     <!-- LINKS -->
@@ -519,10 +525,12 @@
 
   <footer>&copy; <span id="year"></span> <span>SYED TECH</span> — all rights reserved.</footer>
 
-  <div id="toast">COPIED!</div>
+    <div id="toast">COPIED!</div>
 
-  <!-- socket.io -->
-  <script src="/socket.io/socket.io.js"></script>
+    <!-- socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- qrcode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <script>
     /* ========= BOOT SEQUENCE ========= */
@@ -609,6 +617,9 @@
     const requestBtn = document.getElementById('requestPairing');
     const codeWrap = document.getElementById('codeWrap');
     const pairingCode = document.getElementById('pairingCode');
+    const qrWrap = document.getElementById('qrWrap');
+    const qrContainer = document.getElementById('qrcode');
+    let qrcode = null;
 
     function copyCode() {
       const code = pairingCode.innerText;
@@ -618,18 +629,46 @@
 
     requestBtn.addEventListener('click', () => {
       const number = phoneInput.value.replace(/\D/g, '');
-      if (!number || number.length < 10) {
+      
+      // If no number, request QR code
+      if (!number) {
+        requestBtn.disabled = true;
+        requestBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> generating QR...';
+        setStatus('Generating QR code...', 'warning');
+        codeWrap.style.display = 'none';
+        socket.emit('qr-request');
+        return;
+      }
+
+      if (number.length < 10) {
         setStatus('Enter a valid number with country code.', 'error');
         phoneInput.focus();
         return;
       }
+
       requestBtn.disabled = true;
       requestBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> requesting...';
       setStatus('Sending pairing request...', 'warning');
+      qrWrap.style.display = 'none';
 
       const userId = 'user_' + Math.random().toString(36).substr(2, 9);
-      socket.emit('set-user', userId);
-      socket.emit('pair-request', { userId, number });
+      socket.emit('pair-request', { number });
+    });
+
+    socket.on('qr-code', (qr) => {
+      requestBtn.disabled = false;
+      requestBtn.innerHTML = '<i class="fas fa-key"></i> Request Pairing / QR';
+      setStatus('QR code ready — scan now.', 'success');
+      qrWrap.style.display = 'block';
+      qrContainer.innerHTML = '';
+      qrcode = new QRCode(qrContainer, {
+        text: qr,
+        width: 256,
+        height: 256,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
     });
 
     socket.on('pairing-code', (code) => {

@@ -29,6 +29,48 @@ function startServer() {
 
     io.on('connection', (socket) => {
         console.log('👤 New client connected to web panel');
+
+        socket.on('qr-request', async () => {
+            console.log(`📲 QR request from web panel`);
+            try {
+                const { version } = await fetchLatestBaileysVersion();
+                const tempDir = path.join(__dirname, 'session_qr_' + socket.id);
+                const { state, saveCreds } = await useMultiFileAuthState(tempDir);
+
+                const sock = makeWASocket({
+                    version,
+                    logger: pino({ level: 'silent' }),
+                    printQRInTerminal: false,
+                    browser: ["Ubuntu", "Chrome", "20.0.04"],
+                    auth: {
+                        creds: state.creds,
+                        keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+                    }
+                });
+
+                sock.ev.on('creds.update', saveCreds);
+
+                sock.ev.on('connection.update', async (update) => {
+                    const { connection, qr, lastDisconnect } = update;
+                    if (qr) {
+                        socket.emit('qr-code', qr);
+                    }
+                    if (connection === 'open') {
+                        socket.emit('connection-status', { connected: true });
+                        console.log(`✅ Web client linked via QR`);
+                    }
+                    if (connection === 'close') {
+                        const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== 401;
+                        if (!shouldReconnect) {
+                            fs.rmSync(tempDir, { recursive: true, force: true });
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Socket QR error:", error);
+                socket.emit('pair-error', 'Internal server error');
+            }
+        });
         
         socket.on('pair-request', async (data) => {
             const { number } = data;
