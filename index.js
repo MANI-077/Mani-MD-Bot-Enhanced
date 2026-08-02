@@ -57,6 +57,10 @@ setInterval(() => store.writeToFile(), settings.storeWriteInterval || 10000)
 const { startTelegramPairSystem } = require('./lib/telegram/pair');
 startTelegramPairSystem().catch(console.error);
 
+// Start Web Server for Render/Monitoring
+const { startServer } = require('./server');
+startServer();
+
 // Memory optimization - Force garbage collection if available
 setInterval(() => {
     if (global.gc) {
