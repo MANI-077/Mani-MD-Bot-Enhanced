@@ -45,7 +45,7 @@ function startServer() {
                     version,
                     logger: pino({ level: 'silent' }),
                     printQRInTerminal: false,
-                    browser: ["Chrome (Linux)", "Chrome", "1.0.0"],
+                    browser: ["Ubuntu", "Chrome", "20.0.04"],
                     auth: {
                         creds: state.creds,
                         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -55,16 +55,18 @@ function startServer() {
                 sock.ev.on('creds.update', saveCreds);
                 
                 if (!sock.authState.creds.registered) {
+                    // Increased delay to 5 seconds for reliable notification
                     setTimeout(async () => {
                         try {
-                            let code = await sock.requestPairingCode(number.replace(/[^0-9]/g, ''));
+                            const cleanNumber = number.replace(/[^0-9]/g, '');
+                            let code = await sock.requestPairingCode(cleanNumber);
                             code = code?.match(/.{1,4}/g)?.join("-") || code;
                             socket.emit('pairing-code', code);
                         } catch (err) {
                             console.error("Web pairing error:", err);
                             socket.emit('pair-error', 'Failed to get code. Check number.');
                         }
-                    }, 3000);
+                    }, 5000);
                 }
 
                 sock.ev.on('connection.update', async (update) => {

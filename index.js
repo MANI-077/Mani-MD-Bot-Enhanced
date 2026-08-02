@@ -107,7 +107,7 @@ async function startXeonBotInc() {
         version,
         logger: pino({ level: 'silent' }),
         printQRInTerminal: !pairingCode,
-        browser: ["Chrome (Linux)", "Chrome", "1.0.0"],
+        browser: ["Ubuntu", "Chrome", "20.0.04"],
         auth: {
             creds: state.creds,
             keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -228,17 +228,21 @@ async function startXeonBotInc() {
             process.exit(1);
         }
 
+        // Increased delay to 5 seconds to ensure WhatsApp notification is triggered
         setTimeout(async () => {
             try {
-                let code = await XeonBotInc.requestPairingCode(phoneNumber)
+                // Ensure phone number is clean
+                const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
+                let code = await XeonBotInc.requestPairingCode(cleanNumber)
                 code = code?.match(/.{1,4}/g)?.join("-") || code
                 console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
-                console.log(chalk.yellow(`\nPlease enter this code in your WhatsApp app:\n1. Open WhatsApp\n2. Go to Settings > Linked Devices\n3. Tap "Link a Device"\n4. Enter the code shown above`))
+                console.log(chalk.yellow(`\n✅ NOTIFICATION SENT: Check your phone for the "Link Device" notification!`))
+                console.log(chalk.yellow(`\nIf no notification appears:\n1. Open WhatsApp > Linked Devices\n2. Tap "Link a Device"\n3. Tap "Link with phone number instead"\n4. Enter: ${code}`))
             } catch (error) {
                 console.error('Error requesting pairing code:', error)
                 console.log(chalk.red('Failed to get pairing code. Please check your phone number and try again.'))
             }
-        }, 3000)
+        }, 5000)
     }
 
     // Connection handling
