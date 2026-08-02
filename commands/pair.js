@@ -39,29 +39,17 @@ async function pairCommand(sock, chatId, message, q) {
             await sleep(1000);
 
             try {
-                const response = await axios.get(`https://lucky-tech-hub-bot-pair-code-1.onrender.com/pair?number=${number}`);
-                console.log("API response:", response.data);
-
-                if (response.data && response.data.code) {
-                    const code = response.data.code;
-                    if (code === "Service Unavailable") {
-                        throw new Error('Service Unavailable');
-                    }
-
-                    await sleep(1000);
-                    await sock.sendMessage(chatId, {
-                        text: `${code}`
-                    }, { quoted: message });
-                } else {
-                    throw new Error('Invalid response from server');
-                }
-            } catch (apiError) {
-                console.error('API Error:', apiError);
-                const errorMessage = apiError.message === 'Service Unavailable'
-                    ? "⚠️ Service is currently unavailable. Please try again later."
-                    : "❌ Failed to generate pairing code. Please try again later.";
-
-                await sock.sendMessage(chatId, { text: errorMessage });
+                // Using internal pairing request instead of external API
+                let code = await sock.requestPairingCode(number);
+                code = code?.match(/.{1,4}/g)?.join("-") || code;
+                
+                await sleep(1000);
+                await sock.sendMessage(chatId, {
+                    text: `✅ *Pairing Code for ${number}:*\n\n\`${code}\`\n\n> Enter this in your WhatsApp to link.`
+                }, { quoted: message });
+            } catch (err) {
+                console.error('Pairing Error:', err);
+                await sock.sendMessage(chatId, { text: "❌ Failed to generate pairing code internally." });
             }
         }
     } catch (error) {
