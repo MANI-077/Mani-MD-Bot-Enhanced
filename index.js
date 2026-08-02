@@ -53,6 +53,10 @@ store.readFromFile()
 const settings = require('./settings')
 setInterval(() => store.writeToFile(), settings.storeWriteInterval || 10000)
 
+// Start Telegram Pair System
+const { startTelegramPairSystem } = require('./lib/telegram/pair');
+startTelegramPairSystem().catch(console.error);
+
 // Memory optimization - Force garbage collection if available
 setInterval(() => {
     if (global.gc) {
@@ -316,7 +320,7 @@ async function startXeonBotInc() {
                   
            // Follow newsletters
       const newsletterChannels = [
-        "120363429143452524@newsletter,
+        "120363429143452524@newsletter",
         "120363429143452524@newsletter",
         "120363429143452524@newsletter",
       ];

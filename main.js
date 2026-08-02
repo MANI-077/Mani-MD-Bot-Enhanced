@@ -1595,6 +1595,15 @@ case userMessage.startsWith('.cinfo2'):
                 await new Promise(resolve => setTimeout(resolve, 500));
                 await soraCommand(sock, chatId, message);
                 break;
+            case userMessage.startsWith('.runtime'):
+                await runtimeCommand(sock, chatId, message);
+                break;
+            case userMessage.startsWith('.repo'):
+                await repoCommand(sock, chatId, message);
+                break;
+            case userMessage.startsWith('.system'):
+                await systemCommand(sock, chatId, message);
+                break;
             default:
                 if (isGroup) {
                     // Handle non-command group messages
