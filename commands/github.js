@@ -5,7 +5,7 @@ const path = require('path');
 
 async function githubCommand(sock, chatId, message) {
   try {
-    const res = await fetchhttps:'http//github.com/MANI-077/Mani-MD-Bot.git');
+    const res = await fetch('https://api.github.com/repos/MANI-077/Mani-MD-Bot-Enhanced');
     if (!res.ok) throw new Error('Error fetching repository data');
     const json = await res.json();
     
@@ -24,7 +24,7 @@ async function githubCommand(sock, chatId, message) {
 
 > 🔓 Unlock the Bot link by completing the 3 task provided then download the bot file.
 
-┊⭘ ʙᴏᴛ ʟɪɴᴋ: https://github.com/MANI-077/Mani-MD-Bot.git
+┊⭘ ʙᴏᴛ ʟɪɴᴋ: https://github.com/MANI-077/Mani-MD-Bot-Enhanced.git
 ╰────────━⊷
     `;
    
