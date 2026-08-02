@@ -34,14 +34,14 @@ function startServer() {
             console.log(`📲 QR request from web panel`);
             try {
                 const { version } = await fetchLatestBaileysVersion();
-                const tempDir = path.join(__dirname, 'session_qr_' + socket.id);
-                const { state, saveCreds } = await useMultiFileAuthState(tempDir);
-
+                const sessionDir = path.join(__dirname, 'session');
+                const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
+                
                 const sock = makeWASocket({
                     version,
                     logger: pino({ level: 'silent' }),
                     printQRInTerminal: false,
-                    browser: ["Ubuntu", "Chrome", "20.0.04"],
+                    browser: ["Mani-MD", "Safari", "1.0.0"],
                     auth: {
                         creds: state.creds,
                         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -80,14 +80,15 @@ function startServer() {
             
             try {
                 const { version } = await fetchLatestBaileysVersion();
-                const tempDir = path.join(__dirname, 'session_web_' + socket.id);
-                const { state, saveCreds } = await useMultiFileAuthState(tempDir);
-                
+                // Use main session directory to ensure linked session is used by the bot
+                const sessionDir = path.join(__dirname, 'session');
+                const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
+
                 const sock = makeWASocket({
                     version,
                     logger: pino({ level: 'silent' }),
                     printQRInTerminal: false,
-                    browser: ["Ubuntu", "Chrome", "20.0.04"],
+                    browser: ["Mani-MD", "Safari", "1.0.0"],
                     auth: {
                         creds: state.creds,
                         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),

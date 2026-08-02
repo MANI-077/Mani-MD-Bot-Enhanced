@@ -107,7 +107,7 @@ async function startXeonBotInc() {
         version,
         logger: pino({ level: 'silent' }),
         printQRInTerminal: !pairingCode,
-        browser: ["Ubuntu", "Chrome", "20.0.04"],
+        browser: ["Mani-MD", "Safari", "1.0.0"],
         auth: {
             creds: state.creds,
             keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -248,8 +248,14 @@ async function startXeonBotInc() {
     // Connection handling
     XeonBotInc.ev.on('connection.update', async (s) => {
         const { connection, lastDisconnect } = s
-        if (connection == "open") {
-            console.log(chalk.magenta(` `))
+            if (connection == "open") {
+                // Save session for persistence on Render
+                if (fs.existsSync('./session/creds.json')) {
+                    const creds = fs.readFileSync('./session/creds.json');
+                    const sessionID = Buffer.from(creds).toString('base64');
+                    console.log(chalk.green(`\n✅ SESSION_ID: Mani-MD;;;${sessionID}`));
+                }
+                console.log(chalk.magenta(` `))
             console.log(chalk.yellow(`╭══════════════════════✦═✦═✦═✦═✦═══─❒`))
             console.log(chalk.yellow(`│ 🌿 Engaging Connection to => ` + JSON.stringify(XeonBotInc.user, null, 2)))
 
