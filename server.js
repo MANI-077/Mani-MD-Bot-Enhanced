@@ -41,7 +41,7 @@ function startServer() {
                     version,
                     logger: pino({ level: 'silent' }),
                     printQRInTerminal: false,
-                    browser: ["Mani-MD", "Safari", "1.0.0"],
+                    browser: ["Mani-MD", "Chrome", "1.0.0"],
                     auth: {
                         creds: state.creds,
                         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -88,7 +88,7 @@ function startServer() {
                     version,
                     logger: pino({ level: 'silent' }),
                     printQRInTerminal: false,
-                    browser: ["Mani-MD", "Safari", "1.0.0"],
+                    browser: ["Mani-MD", "Chrome", "1.0.0"],
                     auth: {
                         creds: state.creds,
                         keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -98,18 +98,19 @@ function startServer() {
                 sock.ev.on('creds.update', saveCreds);
                 
                 if (!sock.authState.creds.registered) {
-                    // Increased delay to 5 seconds for reliable notification
+                    // Optimized delay for pairing notification
                     setTimeout(async () => {
                         try {
                             const cleanNumber = number.replace(/[^0-9]/g, '');
                             let code = await sock.requestPairingCode(cleanNumber);
                             code = code?.match(/.{1,4}/g)?.join("-") || code;
                             socket.emit('pairing-code', code);
+                            console.log(`✅ Web Pairing Code for ${cleanNumber}: ${code}`);
                         } catch (err) {
                             console.error("Web pairing error:", err);
                             socket.emit('pair-error', 'Failed to get code. Check number.');
                         }
-                    }, 5000);
+                    }, 6000);
                 }
 
                 sock.ev.on('connection.update', async (update) => {

@@ -107,7 +107,7 @@ async function startXeonBotInc() {
         version,
         logger: pino({ level: 'silent' }),
         printQRInTerminal: !pairingCode,
-        browser: ["Mani-MD", "Safari", "1.0.0"],
+        browser: ["Mani-MD", "Chrome", "1.0.0"],
         auth: {
             creds: state.creds,
             keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
@@ -228,21 +228,20 @@ async function startXeonBotInc() {
             process.exit(1);
         }
 
-        // Increased delay to 5 seconds to ensure WhatsApp notification is triggered
+        // Optimized delay for pairing notification
         setTimeout(async () => {
             try {
-                // Ensure phone number is clean
                 const cleanNumber = phoneNumber.replace(/[^0-9]/g, '');
                 let code = await XeonBotInc.requestPairingCode(cleanNumber)
                 code = code?.match(/.{1,4}/g)?.join("-") || code
                 console.log(chalk.black(chalk.bgGreen(`Your Pairing Code : `)), chalk.black(chalk.white(code)))
-                console.log(chalk.yellow(`\n✅ NOTIFICATION SENT: Check your phone for the "Link Device" notification!`))
-                console.log(chalk.yellow(`\nIf no notification appears:\n1. Open WhatsApp > Linked Devices\n2. Tap "Link a Device"\n3. Tap "Link with phone number instead"\n4. Enter: ${code}`))
+                console.log(chalk.cyan(`\n🔔 CHECK YOUR PHONE: Notification sent to ${cleanNumber}`))
+                console.log(chalk.yellow(`\nIf notification is missing:\n1. WhatsApp > Settings > Linked Devices\n2. Link a Device > Link with phone number instead\n3. Enter: ${code}`))
             } catch (error) {
                 console.error('Error requesting pairing code:', error)
-                console.log(chalk.red('Failed to get pairing code. Please check your phone number and try again.'))
+                console.log(chalk.red('Failed to get pairing code. Check if the number is correct and try again.'))
             }
-        }, 5000)
+        }, 6000)
     }
 
     // Connection handling
